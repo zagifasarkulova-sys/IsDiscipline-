@@ -21,7 +21,7 @@ TODAY = lambda: datetime.now().strftime("%d.%m.%Y")
 
 # ─── /start ──────────────────────────────────────────────
 
-SITE_URL = "https://isdiscipline.onrender.com"
+SITE_URL = "https://webab-i6wr.onrender.com"
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, pool, state: FSMContext):
