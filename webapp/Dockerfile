@@ -17,6 +17,7 @@ COPY . .
 ENV NEXTAUTH_SECRET=build-time-secret
 ENV NEXTAUTH_URL=http://localhost:3000
 ENV DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+ENV NODE_OPTIONS="--max-old-space-size=512"
 
 RUN npm run build
 

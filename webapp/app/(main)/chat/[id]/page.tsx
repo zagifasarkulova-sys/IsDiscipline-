@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Send, ArrowLeft, Phone, Video, MoreVertical, Play, Pause } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import io, { Socket } from 'socket.io-client'
+import type { Socket } from 'socket.io-client'
 import { formatTime, getInitials, formatDuration } from '@/lib/utils'
 import { VoiceRecorder } from '@/components/voice-recorder'
 import { VideoCircleRecorder, VideoCircleDisplay } from '@/components/video-circle'
@@ -61,29 +61,30 @@ export default function ChatPage() {
       setLoading(false)
     })
 
-    // Socket.io connection
-    const socket = io({ path: '/api/socket' })
-    socketRef.current = socket
+    // Socket.io connection (dynamic import to avoid SSR issues)
+    let socket: Socket
+    import('socket.io-client').then(({ default: io }) => {
+      socket = io({ path: '/api/socket' })
+      socketRef.current = socket
 
-    socket.emit('join-room', id)
+      socket.emit('join-room', id)
 
-    socket.on('message', (msg: Message) => {
-      setMessages((prev) => [...prev, msg])
-    })
+      socket.on('message', (msg: Message) => {
+        setMessages((prev) => [...prev, msg])
+      })
 
-    socket.on('typing', (userId: string) => {
-      if (userId !== session?.user?.id) {
-        setOtherTyping(true)
-      }
-    })
+      socket.on('typing', (userId: string) => {
+        if (userId !== session?.user?.id) setOtherTyping(true)
+      })
 
-    socket.on('stop-typing', (userId: string) => {
-      if (userId !== session?.user?.id) setOtherTyping(false)
+      socket.on('stop-typing', (userId: string) => {
+        if (userId !== session?.user?.id) setOtherTyping(false)
+      })
     })
 
     return () => {
-      socket.emit('leave-room', id)
-      socket.disconnect()
+      socketRef.current?.emit('leave-room', id)
+      socketRef.current?.disconnect()
     }
   }, [id, session?.user?.id])
 
