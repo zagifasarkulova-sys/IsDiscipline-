@@ -20,12 +20,18 @@ TODAY = lambda: datetime.now().strftime("%d.%m.%Y")
 
 # ─── /start ──────────────────────────────────────────────
 
+SITE_URL = "https://isdiscipline.onrender.com"
+
 @router.message(CommandStart())
 async def cmd_start(message: Message, pool, state: FSMContext):
     await state.clear()
     await db.ensure_user(pool, message.from_user.id, message.from_user.username or "")
     await message.answer(
-        f"👋 Привет, {message.from_user.first_name}!\n\nВыбери действие:",
+        f"👋 Привет, {message.from_user.first_name}!\n\n"
+        f"🚀 Теперь у нас есть полноценная социальная сеть!\n"
+        f"Общайся, делись прогрессом, отслеживай цели вместе с другими:\n\n"
+        f"🌐 {SITE_URL}\n\n"
+        f"Выбери действие:",
         reply_markup=main_menu()
     )
 
