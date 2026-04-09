@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable static generation — all pages are dynamic (we use DB)
+  staticPageGenerationTimeout: 1,
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '**' },
