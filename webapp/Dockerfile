@@ -27,4 +27,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Run migrations then start server
-CMD npx prisma migrate deploy && node server.js
+CMD npx prisma db push --accept-data-loss && node server.js
