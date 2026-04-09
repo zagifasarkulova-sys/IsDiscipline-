@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install --no-audit --no-fund --prefer-offline || npm install --no-audit --no-fund
 
 # Copy prisma schema and generate client
 COPY prisma ./prisma/
