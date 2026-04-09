@@ -3,6 +3,7 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import CommandStart
 from datetime import datetime, timedelta
+from html import escape as he
 
 from states import AddTask, EditTask, FocusSession
 from keyboards import (
@@ -63,7 +64,7 @@ async def add_task_title(message: Message, state: FSMContext):
     await state.update_data(title=message.text.strip())
     await state.set_state(AddTask.waiting_remind_choice)
     await message.answer(
-        f"Задача: <b>{message.text.strip()}</b>\n\nУстановить напоминание?",
+        f"Задача: <b>{he(message.text.strip())}</b>\n\nУстановить напоминание?",
         reply_markup=remind_choice_kb(),
         parse_mode="HTML"
     )
@@ -76,7 +77,7 @@ async def add_task_no_remind(callback: CallbackQuery, state: FSMContext, pool):
     data = await state.get_data()
     await db.add_task(pool, callback.from_user.id, data["title"])
     await state.clear()
-    await callback.message.edit_text(f"✅ Задача добавлена: <b>{data['title']}</b>", parse_mode="HTML")
+    await callback.message.edit_text(f"✅ Задача добавлена: <b>{he(data['title'])}</b>", parse_mode="HTML")
     await callback.message.answer("📋 Задачи:", reply_markup=tasks_menu())
     await callback.answer()
 
@@ -257,7 +258,7 @@ async def task_view(callback: CallbackQuery, pool):
         return
     status = "✅ Выполнена" if task["is_done"] else "⬜️ Не выполнена"
     remind = task["remind_at"].strftime("%d.%m.%Y %H:%M") if task["remind_at"] else "нет"
-    text = f"<b>{task['title']}</b>\n\nСтатус: {status}\nНапоминание: {remind}"
+    text = f"<b>{he(task['title'])}</b>\n\nСтатус: {status}\nНапоминание: {remind}"
     await callback.message.edit_text(text, parse_mode="HTML", reply_markup=task_actions_kb(task_id, task["is_done"]))
 
 
@@ -274,7 +275,7 @@ async def task_edit_title_done(message: Message, state: FSMContext, pool):
     data = await state.get_data()
     await db.update_task_title(pool, data["task_id"], message.text.strip())
     await state.clear()
-    await message.answer(f"✅ Название: <b>{message.text.strip()}</b>", parse_mode="HTML", reply_markup=tasks_menu())
+    await message.answer(f"✅ Название: <b>{he(message.text.strip())}</b>", parse_mode="HTML", reply_markup=tasks_menu())
 
 
 @router.callback_query(F.data.startswith("task_edit_remind:"))
@@ -310,7 +311,7 @@ async def task_toggle_done(callback: CallbackQuery, pool):
     task = await db.get_task(pool, task_id)
     status = "✅ Выполнена" if task["is_done"] else "⬜️ Не выполнена"
     remind = task["remind_at"].strftime("%d.%m.%Y %H:%M") if task["remind_at"] else "нет"
-    text = f"<b>{task['title']}</b>\n\nСтатус: {status}\nНапоминание: {remind}"
+    text = f"<b>{he(task['title'])}</b>\n\nСтатус: {status}\nНапоминание: {remind}"
     await callback.message.edit_text(text, parse_mode="HTML", reply_markup=task_actions_kb(task_id, task["is_done"]))
 
 
@@ -319,7 +320,7 @@ async def task_delete_confirm(callback: CallbackQuery, pool):
     task_id = int(callback.data.split(":")[1])
     task = await db.get_task(pool, task_id)
     await callback.message.edit_text(
-        f"🗑 Удалить <b>{task['title']}</b>?",
+        f"🗑 Удалить <b>{he(task['title'])}</b>?",
         parse_mode="HTML",
         reply_markup=confirm_delete_kb(task_id)
     )
@@ -345,7 +346,7 @@ async def focus_start_menu(message: Message, state: FSMContext, pool):
     session = await db.get_active_session(pool, message.from_user.id)
     if session:
         task = await db.get_task(pool, session["task_id"]) if session["task_id"] else None
-        task_name = task["title"] if task else "без задачи"
+        task_name = he(task["title"]) if task else "без задачи"
         is_paused = session["paused_at"] is not None
         kb = focus_paused_kb() if is_paused else focus_running_kb()
         status = "⏸ На паузе" if is_paused else "▶️ Идёт"
@@ -373,7 +374,7 @@ async def focus_begin(callback: CallbackQuery, state: FSMContext, pool):
     if task_id:
         task = await db.get_task(pool, task_id)
         if task:
-            task_name = task["title"]
+            task_name = he(task["title"])
     await callback.message.edit_text(
         f"🚀 Фокус запущен!\n\nЗадача: <b>{task_name}</b>\n\nУдачи! 💪",
         parse_mode="HTML", reply_markup=focus_running_kb()
@@ -425,7 +426,7 @@ async def focus_finish(callback: CallbackQuery, state: FSMContext, pool):
     if task_id:
         task = await db.get_task(pool, task_id)
         if task:
-            text += f"Задача: <b>{task['title']}</b>\n\nОтметить выполненной?"
+            text += f"Задача: <b>{he(task['title'])}</b>\n\nОтметить выполненной?"
     await callback.message.edit_text(text, parse_mode="HTML", reply_markup=finish_kb)
     if not finish_kb:
         await callback.message.answer("Главное меню:", reply_markup=main_menu())
