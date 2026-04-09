@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VOICE
+  VIDEO_CIRCLE
+  FILE
+}
+
+enum ChatType {
+  DIRECT
+  GROUP
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String?  @unique
+  password     String?
+  avatar       String?
+  bio          String?
+  role         Role     @default(USER)
+  telegramId   String?  @unique
+  streak       Int      @default(0)
+  xp           Int      @default(0)
+  isOnline     Boolean  @default(false)
+  lastSeen     DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sentMessages   Message[]     @relation("SentMessages")
+  chatMembers    ChatMember[]
+  posts          Post[]
+  likes          Like[]
+  comments       Comment[]
+  adminChannels  Channel[]     @relation("ChannelAdmin")
+  channelMembers ChannelMember[]
+}
+
+model Chat {
+  id        String     @id @default(cuid())
+  type      ChatType   @default(DIRECT)
+  name      String?
+  avatar    String?
+  createdAt DateTime   @default(now())
+
+  members  ChatMember[]
+  messages Message[]
+}
+
+model ChatMember {
+  id     String @id @default(cuid())
+  userId String
+  chatId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chatId])
+}
+
+model Message {
+  id        String      @id @default(cuid())
+  content   String?
+  type      MessageType @default(TEXT)
+  fileUrl   String?
+  duration  Int?
+  senderId  String
+  chatId    String
+  createdAt DateTime    @default(now())
+
+  sender User @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  content   String
+  imageUrl  String?
+  authorId  String
+  createdAt DateTime  @default(now())
+
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes    Like[]
+  comments Comment[]
+}
+
+model Like {
+  id     String @id @default(cuid())
+  userId String
+  postId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Channel {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  avatar      String?
+  adminId     String
+  createdAt   DateTime @default(now())
+
+  admin   User            @relation("ChannelAdmin", fields: [adminId], references: [id])
+  members ChannelMember[]
+}
+
+model ChannelMember {
+  id        String @id @default(cuid())
+  channelId String
+  userId    String
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+}
