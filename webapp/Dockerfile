@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # Copy prisma schema and generate client
 COPY prisma ./prisma/
@@ -13,7 +13,11 @@ RUN npx prisma generate
 # Copy all source files
 COPY . .
 
-# Build Next.js
+# Build Next.js (dummy vars needed at build time only)
+ENV NEXTAUTH_SECRET=build-time-secret
+ENV NEXTAUTH_URL=http://localhost:3000
+ENV DATABASE_URL=postgresql://dummy:dummy@localhost:5432/dummy
+
 RUN npm run build
 
 EXPOSE 3000
