@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "node server.js",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate deploy",
-    "postinstall": "prisma generate"
+    "prisma:migrate": "prisma migrate deploy"
   },
   "dependencies": {
     "next": "14.2.5",
@@ -18,14 +17,12 @@
     "next-auth": "^4.24.7",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
-    "framer-motion": "^11.3.24",
-    "lucide-react": "^0.427.0",
+    "framer-motion": "^10.18.0",
+    "lucide-react": "^0.263.1",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.5.2",
-    "date-fns": "^3.6.0",
-    "react-hot-toast": "^2.4.1",
-    "axios": "^1.7.4"
+    "tailwind-merge": "^2.3.0",
+    "react-hot-toast": "^2.4.1"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

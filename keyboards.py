@@ -2,12 +2,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 
 
 def main_menu():
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="🚀 Начать фокус"), KeyboardButton(text="📋 Задачи")]
-        ],
-        resize_keyboard=True
-    )
+    from aiogram.types import ReplyKeyboardRemove
+    return ReplyKeyboardRemove()
 
 
 def tasks_menu():

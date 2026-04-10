@@ -1,48 +1,77 @@
-# Focus Mentor Bot 🎯
+# IsDiscipline
 
-Telegram бот для глубокой работы и движения к целям.
-
-## Возможности
-
-- 🚀 **Deep Work таймер** — 25/50/90 мин с тикающим счётчиком
-- ☀️ **Утренний фокус** — задача дня + уровень энергии
-- 🌙 **Вечерний аудит** — рефлексия вместо штрафов
-- 🔥 **Streak система** — серии дней, XP за выполнение
-- 📊 **Прогресс** — статистика за неделю
-- 🎯 **Цели** — главная цель + цель недели с прогрессом
-- 📅 **Еженедельный обзор** — каждое воскресенье
-
-## Деплой на Render
-
-### 1. Создай PostgreSQL базу данных
-- Render Dashboard → New → PostgreSQL
-- Скопируй `Internal Database URL`
-
-### 2. Создай Web Service
-- New → Web Service → из GitHub репо
-- Runtime: **Docker**
-- Branch: `main`
-
-### 3. Переменные окружения
-```
-BOT_TOKEN=токен_от_BotFather
-DATABASE_URL=internal_database_url_из_render
-RENDER_EXTERNAL_URL=https://твой-сервис.onrender.com
-PORT=8080
-```
-
-### 4. Health Check
-- Health Check Path: `/health`
+Социальная сеть для тех, кто добивается — плюс Telegram бот для продуктивности.
 
 ---
 
-## Настройка cron-job.org
+## Что внутри
 
-Добавь задание для поддержания сервиса активным:
+### Сайт (`webapp/`)
+Полноценное социальное приложение лучше Telegram:
 
+- **Лента** — посты, лайки, комментарии, XP за активность
+- **Чаты** — real-time сообщения, голосовые, видеокружки
+- **Профиль** — streak, XP, статистика
+- **Админ-панель** — полный контроль: пользователи, посты, роли
+- **Тёмный дизайн** — фиолетово-циановая тема, анимации, glassmorphism
+
+### Telegram бот
+- Deep Work таймер (25/50/90 мин)
+- Утренний фокус и вечерний аудит
+- Streak и XP система
+- Еженедельный обзор
+- При старте отправляет ссылку на сайт
+
+---
+
+## Деплой сайта на Render
+
+### 1. PostgreSQL база данных
+- Render Dashboard → New → PostgreSQL
+- Скопируй `Internal Database URL`
+
+### 2. Web Service для сайта
+- New → Web Service → из GitHub репо
+- **Root Directory:** `webapp`
+- **Runtime:** Docker
+- **Branch:** `main`
+
+### 3. Переменные окружения сайта
+```
+DATABASE_URL=internal_database_url_из_render
+NEXTAUTH_SECRET=любая_случайная_строка
+NEXTAUTH_URL=https://твой-сайт.onrender.com
+PORT=3000
+```
+
+### 4. После деплоя
+Первый зарегистрированный пользователь — обычный юзер.
+Чтобы сделать себя админом, выполни в базе:
+```sql
+UPDATE "User" SET role = 'ADMIN' WHERE username = 'твой_username';
+```
+
+---
+
+## Деплой бота на Render
+
+### Web Service для бота
+- Root Directory: `/` (корень репо)
+- Runtime: Docker
+- Health Check Path: `/health`
+
+### Переменные окружения бота
+```
+BOT_TOKEN=токен_от_BotFather
+DATABASE_URL=internal_database_url_из_render
+RENDER_EXTERNAL_URL=https://твой-бот.onrender.com
+PORT=8080
+```
+
+### Поддержание активности (cron-job.org)
 | Поле | Значение |
 |------|----------|
-| URL | `https://твой-сервис.onrender.com/health` |
+| URL | `https://твой-бот.onrender.com/health` |
 | Расписание | Каждые 5 минут |
 | Метод | GET |
 
@@ -52,7 +81,7 @@ PORT=8080
 
 | Команда | Описание |
 |---------|----------|
-| `/start` | Регистрация и главное меню |
+| `/start` | Регистрация, главное меню + ссылка на сайт |
 | `/admin` | Настройки уведомлений |
 
 ## Расписание уведомлений (Asia/Almaty)

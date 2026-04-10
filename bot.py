@@ -13,7 +13,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 TOKEN = os.getenv("BOT_TOKEN")
-WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # https://your-app.onrender.com
+# Render автоматически задаёт RENDER_EXTERNAL_URL, но можно указать WEBHOOK_URL вручную
+WEBHOOK_URL = os.getenv("WEBHOOK_URL") or os.getenv("RENDER_EXTERNAL_URL", "")
 WEBHOOK_PATH = f"/webhook/{TOKEN}"
 PORT = int(os.getenv("PORT", 10000))
 
