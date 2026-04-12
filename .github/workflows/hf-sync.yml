@@ -1,0 +1,29 @@
+name: Sync to Hugging Face Spaces
+
+on:
+  push:
+    branches:
+      - main
+      - claude/social-app-bot-integration-AXLFD
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push webapp to HF Space (Vant)
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          cd webapp
+          git init
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+          git add -A
+          git commit -m "Deploy: ${{ github.sha }}"
+          git push --force https://1skoboy:${HF_TOKEN}@huggingface.co/spaces/1skoboy/vant main
