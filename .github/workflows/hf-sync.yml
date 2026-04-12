@@ -26,4 +26,4 @@ jobs:
           git config user.name "GitHub Actions"
           git add -A
           git commit -m "Deploy: ${{ github.sha }}"
-          git push --force https://1skoboy:${HF_TOKEN}@huggingface.co/spaces/1skoboy/vant main
+          git push --force https://1skoboy:${HF_TOKEN}@huggingface.co/spaces/1skoboy/vant HEAD:main
