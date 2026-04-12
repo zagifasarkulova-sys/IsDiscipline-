@@ -1,5 +1,5 @@
 ---
-title: IsDiscipline
+title: Vant
 emoji: ⚡
 colorFrom: purple
 colorTo: cyan
@@ -8,4 +8,4 @@ app_port: 7860
 pinned: false
 ---
 
-# IsDiscipline — Социальная сеть
+# Vant — Социальная сеть
